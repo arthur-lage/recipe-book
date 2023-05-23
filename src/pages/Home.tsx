@@ -30,7 +30,7 @@ export function Home() {
 
   return (
     <div className="h-screen">
-      {isLoadingRecipes && <Loading />}
+      {isLoadingRecipes ? <Loading loadingText="Loading recipes..." /> : ""}
 
       <Header />
 
