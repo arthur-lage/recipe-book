@@ -28,6 +28,7 @@ export function AuthProvider({ children }: AuthProviderType) {
       const res = await signInWithPopup(auth, provider);
 
       setCurrentUser({
+        id: res.user.uid,
         displayName: res.user?.displayName,
         email: res.user?.email,
         photoURL: res.user?.photoURL,
@@ -45,7 +46,12 @@ export function AuthProvider({ children }: AuthProviderType) {
   useEffect(() => {
     auth.onAuthStateChanged((user) => {
       if (user) {
-        return setCurrentUser(user);
+        return setCurrentUser({
+          id: user.uid,
+          displayName: user?.displayName,
+          email: user?.email,
+          photoURL: user?.photoURL,
+        });
       }
 
       setCurrentUser(null);
