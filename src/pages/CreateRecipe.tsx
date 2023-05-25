@@ -16,7 +16,7 @@ export function CreateRecipe() {
   const {
     register,
     handleSubmit,
-    formState: { errors, isValid },
+    formState: { isValid },
   } = useForm<Inputs>({
     mode: "onChange",
   });
