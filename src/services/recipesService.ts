@@ -1,6 +1,7 @@
 import { get, push, ref, set } from "firebase/database";
 import { database } from "../lib/firebase";
 import { IRecipe } from "../interfaces/IRecipe";
+import { formatDate } from "../utils/formatDate";
 
 interface ICreateRecipe {
   name: string;
@@ -8,9 +9,6 @@ interface ICreateRecipe {
   ingredients: string[];
   howToPrepare: string;
   timeToPrepare: number;
-  photoURL: string;
-  postedAt: string;
-  postedBy: string;
 }
 
 export const recipesService = {
@@ -32,16 +30,28 @@ export const recipesService = {
 
     return recipeData;
   },
-  async create(newRecipe: ICreateRecipe) {
+  async create(
+    newRecipe: ICreateRecipe,
+    user: { userId: string; displayName: string }
+  ) {
     try {
-      const recipesRef = ref(database, "recipes");
+      const recipesDatabaseRef = ref(database, "recipes");
+      const newRecipeRef = push(recipesDatabaseRef);
 
-      const newRecipeRef = push(recipesRef);
+      // TODO: upload recipe pic and retrive its download link link
 
-      const newRecipeId = newRecipeRef.key;
-      const recipeWithId = { ...newRecipe, id: newRecipeId };
+      const postedAt = formatDate.toFirebase(new Date());
 
-      await set(newRecipeRef, recipeWithId);
+      const recipeData = {
+        ...newRecipe,
+        id: newRecipeRef.key,
+        userId: user.userId,
+        postedBy: user.displayName,
+        postedAt,
+        photoURL: "",
+      };
+
+      await set(newRecipeRef, recipeData);
 
       return "Recipe created successfully";
     } catch (err: any) {
