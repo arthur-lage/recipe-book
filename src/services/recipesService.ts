@@ -24,6 +24,14 @@ export const recipesService = {
 
     return dataArray;
   },
+  async getById(id: string) {
+    const recipeRef = ref(database, "recipes/" + id);
+
+    const snapshot = await get(recipeRef);
+    const recipeData = snapshot.val();
+
+    return recipeData;
+  },
   async create(newRecipe: ICreateRecipe) {
     try {
       const recipesRef = ref(database, "recipes");
