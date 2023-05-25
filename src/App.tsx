@@ -1,6 +1,6 @@
 import { ProtectedRoute } from "./components/ProtectedRoute";
 import { useAuth } from "./hooks/useAuth";
-import { AuthPage, Home, RecipePage } from "./pages";
+import { AuthPage, Home, RecipePage, CreateRecipe } from "./pages";
 import { Routes, Route, Navigate } from "react-router-dom";
 
 export function App() {
@@ -25,6 +25,8 @@ export function App() {
           </ProtectedRoute>
         }
       />
+
+      <Route path="/recipes/new" element={<CreateRecipe />} />
 
       <Route
         path="/auth"
