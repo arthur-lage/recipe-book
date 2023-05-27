@@ -1,5 +1,10 @@
 import { get, push, ref, set } from "firebase/database";
-import { database } from "../lib/firebase";
+import {
+  getDownloadURL,
+  ref as storageRefFirebase,
+  uploadBytes,
+} from "firebase/storage";
+import { database, storage } from "../lib/firebase";
 import { IRecipe } from "../interfaces/IRecipe";
 import { formatDate } from "../utils/formatDate";
 
@@ -9,6 +14,7 @@ interface ICreateRecipe {
   ingredients: string[];
   howToPrepare: string;
   timeToPrepare: number;
+  photoURL: string;
 }
 
 export const recipesService = {
@@ -18,7 +24,7 @@ export const recipesService = {
     const snapshot = await get(recipesRef);
     const dataObject = snapshot.val();
 
-    const dataArray: IRecipe[] = Object.values(dataObject);
+    const dataArray: IRecipe[] = dataObject ? Object.values(dataObject) : [];
 
     return dataArray;
   },
@@ -38,8 +44,6 @@ export const recipesService = {
       const recipesDatabaseRef = ref(database, "recipes");
       const newRecipeRef = push(recipesDatabaseRef);
 
-      // TODO: upload recipe pic and retrive its download link link
-
       const postedAt = formatDate.toFirebase(new Date());
 
       const recipeData = {
@@ -48,7 +52,6 @@ export const recipesService = {
         userId: user.userId,
         postedBy: user.displayName,
         postedAt,
-        photoURL: "",
       };
 
       await set(newRecipeRef, recipeData);
@@ -56,6 +59,27 @@ export const recipesService = {
       return "Recipe created successfully";
     } catch (err: any) {
       throw new Error("Failed to create recipe: " + err.message);
+    }
+  },
+  async uploadImage(file: File, userId: string) {
+    if (file) {
+      const storageRef = storageRefFirebase(
+        storage,
+        "recipes/images/" + new Date().getTime() + userId + file.name
+      );
+
+      const fileRef = await uploadBytes(storageRef, file);
+
+      const url = await getDownloadURL(fileRef.ref);
+      return url;
+    } else {
+      const storageRef = storageRefFirebase(
+        storage,
+        "recipes/images/" + "no-images-found.png"
+      );
+
+      const url = await getDownloadURL(storageRef);
+      return url;
     }
   },
 };
