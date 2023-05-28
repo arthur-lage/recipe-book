@@ -7,8 +7,8 @@ export function AuthPage() {
   const { signInWithGoogle } = useAuth();
 
   return (
-    <div className="flex flex-col items-center justify-center h-screen bg-gradient-to-br from-zinc-900 to-zinc-700">
-      <p className="text-white font-medium text-lg font-poppins mb-2">
+    <div className="flex flex-col items-center justify-center h-screen">
+      <p className="text-zinc-900 font-medium text-lg font-poppins mb-2">
         Welcome to
       </p>
       <h1 className="text-4xl text-emerald-400 font-bold font-poppins">
@@ -21,7 +21,7 @@ export function AuthPage() {
 
       <button
         onClick={signInWithGoogle}
-        className="bg-gradient-to-br from-emerald-700 to-emerald-500 px-2 py-2 rounded-md flex items-center gap-3"
+        className="bg-emerald-500 px-2 py-2 rounded-md flex items-center gap-3"
       >
         <GoogleLogo size={32} weight="fill" className="text-white" />
         <span className="text-lg font-medium font-poppins text-white">
