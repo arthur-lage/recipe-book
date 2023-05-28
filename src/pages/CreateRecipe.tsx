@@ -4,6 +4,8 @@ import { useAuth } from "../hooks/useAuth";
 import { recipesService } from "../services/recipesService";
 import { useFieldArray, useForm } from "react-hook-form";
 import { useNavigate } from "react-router-dom";
+import { Loading } from "../components/Loading";
+import { useState } from "react";
 
 type Inputs = {
   name: string;
@@ -15,6 +17,8 @@ type Inputs = {
 };
 
 export function CreateRecipe() {
+  const [isCreatingRecipe, setIsCreatingRecipe] = useState(false);
+
   const { currentUser } = useAuth();
   const {
     control,
@@ -51,6 +55,8 @@ export function CreateRecipe() {
     }
 
     try {
+      setIsCreatingRecipe(true);
+
       const photoURL = await recipesService.uploadImage(
         imageFile[0],
         currentUser?.id
@@ -76,11 +82,15 @@ export function CreateRecipe() {
       navigate("/");
     } catch (err: any) {
       console.error("Could not create recipe: " + err.message);
+    } finally {
+      setIsCreatingRecipe(false);
     }
   }
 
   return (
     <div className="h-screen">
+      {isCreatingRecipe ? <Loading loadingText="Saving recipe..." /> : ""}
+
       <Header />
 
       <main className="mt-6 font-poppins px-6 pb-6">
@@ -121,7 +131,7 @@ export function CreateRecipe() {
             <textarea
               {...register("description", { required: true })}
               id="recipe-description"
-              className="create-recipe-form-control"
+              className="create-recipe-form-control min-h-[6.5rem]"
               placeholder="Tell us a little more about this recipe..."
             ></textarea>
           </div>
@@ -175,7 +185,7 @@ export function CreateRecipe() {
             <textarea
               id="recipe-how-to-prepare"
               {...register("howToPrepare", { required: true })}
-              className="create-recipe-form-control"
+              className="create-recipe-form-control min-h-[7.5rem]"
               placeholder="Write the necessary steps to prepare this recipe..."
             ></textarea>
           </div>
@@ -197,7 +207,7 @@ export function CreateRecipe() {
           </div>
 
           <button
-            disabled={!isValid}
+            disabled={!isValid || isCreatingRecipe}
             className="disabled:opacity-60 mt-4 text-white font-semibold py-2 tracking-wider text-lg w-full rounded-md bg-green-500 hover:brightness-110"
             type="submit"
           >
