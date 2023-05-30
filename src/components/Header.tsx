@@ -64,6 +64,15 @@ export function Header() {
         </li>
 
         <li className="w-full">
+          <Link
+            className="mobile-nav-link bg-gradient-to-br from-slate-600 to-slate-500"
+            to="/recipes/saved"
+          >
+            Saved Recipes
+          </Link>
+        </li>
+
+        <li className="w-full">
           <button
             className="mobile-nav-link bg-gradient-to-br from-rose-600 to-rose-500"
             onClick={logout}
