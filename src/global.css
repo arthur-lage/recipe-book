@@ -8,11 +8,11 @@
 }
 
 .text-multiple-lines {
-  white-space: pre-line
+  white-space: pre-line;
 }
 
 .mobile-nav-link {
-  @apply rounded-md w-full py-2 px-4 text-lg font-semibold font-poppins text-white;
+  @apply flex justify-center items-center rounded-md w-full py-2 px-4 text-lg font-semibold font-poppins text-white;
 }
 
 .mobile-menu {
