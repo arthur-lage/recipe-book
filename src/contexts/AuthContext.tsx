@@ -3,6 +3,7 @@ import { GoogleAuthProvider, signInWithPopup, signOut } from "firebase/auth";
 import { auth } from "../lib/firebase";
 import { IUser } from "../interfaces/IUser";
 import { useNavigate } from "react-router-dom";
+import { usersService } from "../services/usersService";
 
 type AuthContextType = {
   signInWithGoogle: () => Promise<void>;
@@ -44,8 +45,20 @@ export function AuthProvider({ children }: AuthProviderType) {
   }
 
   useEffect(() => {
-    auth.onAuthStateChanged((user) => {
+    auth.onAuthStateChanged(async (user) => {
       if (user) {
+        const userExistsInDatabase = await usersService.checkIfUserExists(
+          user.uid
+        );
+
+        if (!userExistsInDatabase) {
+          await usersService.addUserToDatabase({
+            id: user.uid,
+            displayName: user.displayName,
+            email: user.email,
+          });
+        }
+
         return setCurrentUser({
           id: user.uid,
           displayName: user?.displayName,
