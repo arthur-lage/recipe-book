@@ -6,11 +6,47 @@ import { IRecipe } from "../interfaces/IRecipe";
 import { Loading } from "../components/Loading";
 import { formatDate } from "../utils/formatDate";
 import { replaceLinebreakForBrTag } from "../utils/replaceLinebreakForBrTag";
+import { Bookmark } from "@phosphor-icons/react";
+import { favoriteRecipesService } from "../services/favoriteRecipesService";
+import { useAuth } from "../hooks/useAuth";
 
 export function RecipePage() {
   const [recipe, setRecipe] = useState<null | IRecipe>(null);
   const [isLoadingRecipe, setIsLoadingRecipe] = useState(true);
+  const [isRecipeAlreadySaved, setIsRecipeAlreadySaved] = useState(false);
+
   const { recipeId } = useParams();
+  const { currentUser } = useAuth();
+
+  async function handleSaveRecipe() {
+    if (!currentUser) {
+      throw new Error("You need to be logged in in order to save recipes");
+    }
+
+    if (recipeId == undefined || !recipeId)
+      throw new Error("Invalid recipe id");
+
+    try {
+      if (!isRecipeAlreadySaved) {
+        await favoriteRecipesService.addRecipeToFavorites(
+          currentUser.id,
+          recipeId
+        );
+
+        setIsRecipeAlreadySaved(true);
+      } else {
+        await favoriteRecipesService.removeRecipeFromFavorites(
+          currentUser.id,
+          recipeId
+        );
+
+        setIsRecipeAlreadySaved(false);
+      }
+    } catch (err) {
+      console.error(err);
+      throw err;
+    }
+  }
 
   useEffect(() => {
     async function fetchRecipe() {
@@ -28,7 +64,24 @@ export function RecipePage() {
       }
     }
 
+    async function checkIfRecipeIsSaved() {
+      if (!currentUser) {
+        return;
+      }
+
+      if (recipeId == undefined || !recipeId)
+        throw new Error("Invalid recipe id");
+
+      const res = await favoriteRecipesService.checkIfRecipeIsSaved(
+        currentUser?.id,
+        recipeId
+      );
+
+      setIsRecipeAlreadySaved(res);
+    }
+
     fetchRecipe();
+    checkIfRecipeIsSaved();
   }, [recipeId]);
 
   return (
@@ -42,6 +95,17 @@ export function RecipePage() {
               <Header />
 
               <main className="px-6 mt-8 pb-5">
+                <button
+                  onClick={handleSaveRecipe}
+                  className="flex items-center gap-1 p-2 rounded-md mb-3 bg-gray-800 text-white"
+                  type="button"
+                >
+                  <Bookmark weight="fill" size={32} />
+                  <span>
+                    {!isRecipeAlreadySaved ? "Save Recipe" : "Recipe is saved"}
+                  </span>
+                </button>
+
                 <h2 className="font-bold text-xl mb-3">{recipe.name}</h2>
 
                 <div className="flex flex-col gap-1">
