@@ -4,7 +4,6 @@ import { Loading } from "../components/Loading";
 import { favoriteRecipesService } from "../services/favoriteRecipesService";
 import { IRecipe } from "../interfaces/IRecipe";
 import { useAuth } from "../hooks/useAuth";
-import { RecipeCard } from "../components/RecipeCard";
 import { RecipeList } from "../components/RecipeList";
 
 export function SavedRecipes() {
